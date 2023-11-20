@@ -1,113 +1,167 @@
+'use client';
 import Image from 'next/image'
+import { useState, useEffect } from 'react';
+
 
 export default function Home() {
+
+  const [dataClay, setDataClay] = useState([]);
+  const [dataBrick, setDataBrick] = useState([]);
+  const [dataSalt, setDataSalt] = useState([]);
+  const [dataConstructionPowder, setDataConstructionPowder] = useState([]);
+  const [dataHotato, setDataHotato] = useState([]);
+  const [dataCookingMix, setDataCookingMix] = useState(10);
+  const [dataHotka, setDataHotka] = useState([]);
+  
+  useEffect(() => {
+    const fetchData = async (url, setData, multiplier) => {
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+  
+        // Filter active listings
+        const activeListings = data.listings.filter(listing => listing.state === 'active');
+  
+        // Sort by price
+        const sortedListings = activeListings.sort((a, b) => a.price - b.price);
+  
+        // Get the first 5 listings
+        const firstThreeListngs = sortedListings.slice(0, 3);
+  
+        // Calculate the average price
+        const averagePrice = parseFloat((firstThreeListngs.reduce((total, listing) => total + listing.price, 0) / firstThreeListngs.length).toFixed(2));
+  
+        // Set the average price in state
+        setData(averagePrice * multiplier);
+      } catch (error) {
+        console.error('Fetch failed:', error);
+      }
+    };
+  
+    fetchData('https://pixels-server.pixels.xyz/v1/marketplace/item/itm_clay', setDataClay, 1);
+    fetchData('https://pixels-server.pixels.xyz/v1/marketplace/item/itm_brick', setDataBrick, 1);
+    fetchData('https://pixels-server.pixels.xyz/v1/marketplace/item/itm_Marble', setDataSalt, 1)
+    fetchData('https://pixels-server.pixels.xyz/v1/marketplace/item/itm_constructionPowder', setDataConstructionPowder, 1)
+    fetchData('https://pixels-server.pixels.xyz/v1/marketplace/item/itm_hotato', setDataHotato, 1)
+    fetchData('https://pixels-server.pixels.xyz/v1/marketplace/item/itm_hotato_hotka', setDataHotka, 1)
+  }, []);
+
+  function calculateBtoE (profit, energy) {
+    return (profit / energy).toFixed(2);
+  }
+
+  function calculateProfit (sellPrice, buyPrice) {
+    return (sellPrice - buyPrice).toFixed(2);
+  }
+
+  function calculateTotal (price1, price2) {
+    return (price1 + price2).toFixed(2);
+  }
+
+  function isWorth (btoe) {
+    let worth = btoe > 4 ? 'Yes' : 'No'
+    return worth;
+  }
+
+  function TableRow({ index, process, material1, material2, price1, price2, product, sellPrice, energy, calculateTotal, calculateProfit, calculateBtoE, isWorth }) {
+    const totalCost = calculateTotal(price1, price2 || 0);
+    const profit = calculateProfit(sellPrice, totalCost);
+    const btoe = calculateBtoE(profit, energy);
+    const worth = isWorth(btoe);
+  
+    const profitClass = profit > 0 ? 'bg-green-500' : 'bg-red-500 text-black';
+    const worthClass = worth === 'No' ? 'bg-yellow-500' : '';
+  
+    return (
+      <tr className={`${index % 2 === 0 ? "" : "hover"} ${profitClass} ${worthClass}`}>
+        <th>{index + 1}</th>
+        <td>{process}</td>
+        <td>{material1}</td>
+        <td>{price1}</td>
+        <td>{material2 || ""}</td>
+        <td>{price2 || ""}</td>
+        <td>{totalCost}</td>
+        <td>{product}</td>
+        <td>{sellPrice}</td>
+        <td>{profit}</td>
+        <td>{energy}</td>
+        <td>{btoe}</td>
+        <td>{worth}</td>
+      </tr>
+    );
+  }
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.js</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800 hover:dark:bg-opacity-30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    <div className='flex flex-col'>
+      <h1 className="text-4xl font-bold text-center">Pixels MinMax-er</h1>
+      <div className="overflow-x-auto">
+        <table className="table">
+          {/* head */}
+          <thead>
+            <tr>
+              <th></th>
+              <th>Process</th>
+              <th>Raw Material 1</th>
+              <th>Price Average</th>
+              <th>Raw Material 2</th>
+              <th>Price Average</th>
+              <th>Total</th>
+              <th>Material Produced</th>
+              <th>Sell Price</th>
+              <th>Profit</th>
+              <th>Energy Needed</th>
+              <th>B/E</th>
+              <th>Worth?</th>
+            </tr>
+          </thead>
+          <tbody>
+          <TableRow
+            index={0}
+            process="Clay to Bricks"
+            material1="Clay x36"
+            price1={dataClay * 36}
+            product="Bricks x12"
+            sellPrice={dataBrick * 12}
+            energy={30}
+            calculateTotal={calculateTotal}
+            calculateProfit={calculateProfit}
+            calculateBtoE={calculateBtoE}
+            isWorth={isWorth}
+          />
+          <TableRow
+            index={1}
+            process="Construction Powder"
+            material1="Bricks x2"
+            price1={dataBrick * 2}
+            material2="Salt Blocks x4"
+            price2={dataSalt * 4}
+            product="Construction Powder x1"
+            sellPrice={dataConstructionPowder}
+            energy={6}
+            calculateTotal={calculateTotal}
+            calculateProfit={calculateProfit}
+            calculateBtoE={calculateBtoE}
+            isWorth={isWorth}
+          />
+          <TableRow
+            index={1}
+            process="Hotka"
+            material1="Hotato x24"
+            price1={dataHotato * 24}
+            material2="Cooking Mix x10"
+            price2={dataCookingMix * 10}
+            product="Hotka x1"
+            sellPrice={dataHotka}
+            energy={2}
+            calculateTotal={calculateTotal}
+            calculateProfit={calculateProfit}
+            calculateBtoE={calculateBtoE}
+            isWorth={isWorth}
+          />
+          </tbody>
+        </table>
+    </div>
+    </div>
   )
+
 }

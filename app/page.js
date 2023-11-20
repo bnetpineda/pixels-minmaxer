@@ -5,19 +5,23 @@ import { useState, useEffect } from 'react';
 
 export default function Home() {
 
+  const [dataWaterMintSeed, setDataWaterMintSeed] = useState(12);
+  const [dataWaterMint, setDataWaterMint] = useState(24);
+  const [dataHotatoSeed, setHotatoSeed] = useState(14);
+  const [dataCookingMix, setDataCookingMix] = useState(10);
+  const [dataCraftingMix, setDataCraftingMix] = useState(100);
+
   const [dataClay, setDataClay] = useState([]);
   const [dataBrick, setDataBrick] = useState([]);
   const [dataSalt, setDataSalt] = useState([]);
   const [dataConstructionPowder, setDataConstructionPowder] = useState([]);
   const [dataHotato, setDataHotato] = useState([]);
-  const [dataCookingMix, setDataCookingMix] = useState(10);
   const [dataHotka, setDataHotka] = useState([]);
   const [dataEnergyDrink, setDataEnergyDrink] = useState([]);
-  const [dataWaterMintSeed, setDataWaterMintSeed] = useState(12);
-  const [dataWaterMint, setDataWaterMint] = useState(24);
-  const [dataHotatoSeed, setHotatoSeed] = useState(14);
   const [dataPopberryWine, setDataPopberryWine] = useState([]);
   const [dataPopberry, setDataPopberry] = useState([]);
+  const [dataQueenBee, setDataQueenBee] = useState([]);
+  const [dataVoidtonium, setDataVoidtonium] = useState([]);
   
   
   useEffect(() => {
@@ -44,7 +48,7 @@ export default function Home() {
         const averagePrice = parseFloat((firstListings.reduce((total, listing) => total + listing.price, 0) / firstListings.length).toFixed(2));
   
         // Set the average price in state
-        setData(averagePrice * multiplier);
+        setData((averagePrice * multiplier).toFixed(2));
       } catch (error) {
         console.error('Fetch failed:', error);
       }
@@ -59,6 +63,8 @@ export default function Home() {
     fetchData('https://pixels-server.pixels.xyz/v1/marketplace/item/itm_energyDrink', setDataEnergyDrink, 1)
     fetchData('https://pixels-server.pixels.xyz/v1/marketplace/item/itm_popberrywine', setDataPopberryWine, 1)
     fetchData('https://pixels-server.pixels.xyz/v1/marketplace/item/itm_popberryFruit', setDataPopberry, 1)
+    fetchData('https://pixels-server.pixels.xyz/v1/marketplace/item/itm_queenbee', setDataQueenBee, 1)
+    fetchData('https://pixels-server.pixels.xyz/v1/marketplace/item/itm_void', setDataVoidtonium, 1)
 
   }, []);
 
@@ -70,32 +76,36 @@ export default function Home() {
     return (sellPrice - buyPrice).toFixed(2);
   }
 
-  function calculateTotal (price1, price2) {
-    return (price1 + price2).toFixed(2);
-  }
-
   function isWorth (btoe) {
     let worth = btoe > 2 ? 'Yes' : 'No'
     return worth;
   }
 
-  function TableRow({ index, process, material1, material2, price1, price2, product, sellPrice, energy, calculateTotal, calculateProfit, calculateBtoE, isWorth }) {
-    const totalCost = calculateTotal(price1, price2 || 0);
+  function calculateTotal (price1, price2, price3 = 0, price4 = 0) {
+    return (price1 + price2 + price3 + price4).toFixed(2);
+  }
+  
+  function TableRow({ index, process, material1, material2, material3, material4, price1, price2, price3, price4, product, sellPrice, energy, calculateTotal, calculateProfit, calculateBtoE, isWorth }) {
+    const totalCost = parseInt(calculateTotal(price1, price2 || 0, price3 || 0, price4 || 0)).toFixed(2);
     const profit = calculateProfit(sellPrice, totalCost);
     const btoe = calculateBtoE(profit, energy);
     const worth = isWorth(btoe);
   
-    const profitClass = profit > 0 ? 'bg-green-500' : 'bg-red-500 text-black';
     const worthClass = worth === 'No' ? 'bg-yellow-500' : '';
+    const profitClass = profit > 0 ? 'bg-green-500' : 'bg-red-500';
   
     return (
-      <tr className={`${index % 2 === 0 ? "" : "hover"} ${profitClass} ${worthClass}`}>
+      <tr className={`${profitClass} ${worthClass}`}>
         <th>{index + 1}</th>
         <td>{process}</td>
         <td>{material1}</td>
         <td>{price1}</td>
         <td>{material2 || ""}</td>
         <td>{price2 || ""}</td>
+        <td>{material3 || ""}</td>
+        <td>{price3 || ""}</td>
+        <td>{material4 || ""}</td>
+        <td>{price4 || ""}</td>
         <td>{totalCost}</td>
         <td>{product}</td>
         <td>{sellPrice}</td>
@@ -120,6 +130,10 @@ export default function Home() {
               <th>Raw Material 1</th>
               <th>Price Average</th>
               <th>Raw Material 2</th>
+              <th>Price Average</th>
+              <th>Raw Material 3</th>
+              <th>Price Average</th>
+              <th>Raw Material 4</th>
               <th>Price Average</th>
               <th>Total</th>
               <th>Material Produced</th>
@@ -160,7 +174,7 @@ export default function Home() {
             isWorth={isWorth}
           />
           <TableRow
-            index={1}
+            index={2}
             process="Hotka"
             material1="Hotato x24"
             price1={dataHotato * 24}
@@ -175,7 +189,7 @@ export default function Home() {
             isWorth={isWorth}
           />
           <TableRow
-            index={1}
+            index={3}
             process="Watermint Farming w/ Energy Drink"
             material1="WatermintSeed x60"
             price1={dataWaterMint * 60}
@@ -190,7 +204,7 @@ export default function Home() {
             isWorth={isWorth}
           />
           <TableRow
-            index={1}
+            index={4}
             process="Hotato Farming w/ Energy Drink"
             material1="HotatoSeed x60"
             price1={dataHotatoSeed * 60}
@@ -205,7 +219,7 @@ export default function Home() {
             isWorth={isWorth}
           />
           <TableRow
-            index={1}
+            index={5}
             process="Popberry Wine"
             material1="Popberry x24"
             price1={dataPopberry * 24}
@@ -214,6 +228,25 @@ export default function Home() {
             product="PopberryWine x1"
             sellPrice={dataPopberryWine * 1}
             energy={2}
+            calculateTotal={calculateTotal}
+            calculateProfit={calculateProfit}
+            calculateBtoE={calculateBtoE}
+            isWorth={isWorth}
+          />
+          <TableRow
+            index={6}
+            process="Pure Hotato"
+            material1="Construction Powder x3"
+            price1={dataConstructionPowder * 3}
+            material2="Crafting Mix x3"
+            price2={dataCraftingMix * 3}
+            material3="Queen Bee x1"
+            price3={dataQueenBee * 1}
+            material4="Voidtonium x1.25"
+            price4={dataVoidtonium * 1.25}
+            product="Hotato x100"
+            sellPrice={dataHotato * 100}
+            energy={1050}
             calculateTotal={calculateTotal}
             calculateProfit={calculateProfit}
             calculateBtoE={calculateBtoE}

@@ -31,12 +31,17 @@ export default function Home() {
   
         // Sort by price
         const sortedListings = activeListings.sort((a, b) => a.price - b.price);
-  
-        // Get the first 5 listings
-        const firstThreeListngs = sortedListings.slice(0, 3);
+
+        let firstListings;
+        if(sortedListings[0].itemId === "itm_popberryFruit"){
+          firstListings = sortedListings.slice(3, 15);
+        }
+        else {
+          firstListings = sortedListings.slice(0, 3);
+        }
   
         // Calculate the average price
-        const averagePrice = parseFloat((firstThreeListngs.reduce((total, listing) => total + listing.price, 0) / firstThreeListngs.length).toFixed(2));
+        const averagePrice = parseFloat((firstListings.reduce((total, listing) => total + listing.price, 0) / firstListings.length).toFixed(2));
   
         // Set the average price in state
         setData(averagePrice * multiplier);

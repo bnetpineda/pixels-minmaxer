@@ -12,6 +12,13 @@ export default function Home() {
   const [dataHotato, setDataHotato] = useState([]);
   const [dataCookingMix, setDataCookingMix] = useState(10);
   const [dataHotka, setDataHotka] = useState([]);
+  const [dataEnergyDrink, setDataEnergyDrink] = useState([]);
+  const [dataWaterMintSeed, setDataWaterMintSeed] = useState(12);
+  const [dataWaterMint, setDataWaterMint] = useState(24);
+  const [dataHotatoSeed, setHotatoSeed] = useState(14);
+  const [dataPopberryWine, setDataPopberryWine] = useState([]);
+  const [dataPopberry, setDataPopberry] = useState([]);
+  
   
   useEffect(() => {
     const fetchData = async (url, setData, multiplier) => {
@@ -37,13 +44,17 @@ export default function Home() {
         console.error('Fetch failed:', error);
       }
     };
-  
+    
     fetchData('https://pixels-server.pixels.xyz/v1/marketplace/item/itm_clay', setDataClay, 1);
     fetchData('https://pixels-server.pixels.xyz/v1/marketplace/item/itm_brick', setDataBrick, 1);
     fetchData('https://pixels-server.pixels.xyz/v1/marketplace/item/itm_Marble', setDataSalt, 1)
     fetchData('https://pixels-server.pixels.xyz/v1/marketplace/item/itm_constructionPowder', setDataConstructionPowder, 1)
     fetchData('https://pixels-server.pixels.xyz/v1/marketplace/item/itm_hotato', setDataHotato, 1)
     fetchData('https://pixels-server.pixels.xyz/v1/marketplace/item/itm_hotato_hotka', setDataHotka, 1)
+    fetchData('https://pixels-server.pixels.xyz/v1/marketplace/item/itm_energyDrink', setDataEnergyDrink, 1)
+    fetchData('https://pixels-server.pixels.xyz/v1/marketplace/item/itm_popberrywine', setDataPopberryWine, 1)
+    fetchData('https://pixels-server.pixels.xyz/v1/marketplace/item/itm_popberryFruit', setDataPopberry, 1)
+
   }, []);
 
   function calculateBtoE (profit, energy) {
@@ -59,7 +70,7 @@ export default function Home() {
   }
 
   function isWorth (btoe) {
-    let worth = btoe > 4 ? 'Yes' : 'No'
+    let worth = btoe > 2 ? 'Yes' : 'No'
     return worth;
   }
 
@@ -152,6 +163,51 @@ export default function Home() {
             price2={dataCookingMix * 10}
             product="Hotka x1"
             sellPrice={dataHotka}
+            energy={2}
+            calculateTotal={calculateTotal}
+            calculateProfit={calculateProfit}
+            calculateBtoE={calculateBtoE}
+            isWorth={isWorth}
+          />
+          <TableRow
+            index={1}
+            process="Watermint Farming w/ Energy Drink"
+            material1="WatermintSeed x60"
+            price1={dataWaterMint * 60}
+            material2="Energy Drink x10"
+            price2={dataEnergyDrink * 10}
+            product="Watermint x60"
+            sellPrice={dataWaterMint * 60}
+            energy={440}
+            calculateTotal={calculateTotal}
+            calculateProfit={calculateProfit}
+            calculateBtoE={calculateBtoE}
+            isWorth={isWorth}
+          />
+          <TableRow
+            index={1}
+            process="Hotato Farming w/ Energy Drink"
+            material1="HotatoSeed x60"
+            price1={dataHotatoSeed * 60}
+            material2="Energy Drink x10"
+            price2={dataEnergyDrink * 10}
+            product="Hotato x60"
+            sellPrice={dataHotato * 60}
+            energy={630}
+            calculateTotal={calculateTotal}
+            calculateProfit={calculateProfit}
+            calculateBtoE={calculateBtoE}
+            isWorth={isWorth}
+          />
+          <TableRow
+            index={1}
+            process="Popberry Wine"
+            material1="Popberry x24"
+            price1={dataPopberry * 24}
+            material2="Cooking Mix x10"
+            price2={dataCookingMix * 10}
+            product="PopberryWine x1"
+            sellPrice={dataPopberryWine * 1}
             energy={2}
             calculateTotal={calculateTotal}
             calculateProfit={calculateProfit}

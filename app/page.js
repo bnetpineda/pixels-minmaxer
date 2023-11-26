@@ -35,17 +35,20 @@ export default function Home() {
   
         // Sort by price
         const sortedListings = activeListings.sort((a, b) => a.price - b.price);
-
-        let firstListings;
-        if(sortedListings[0].itemId === "itm_popberryFruit"){
-          firstListings = sortedListings.slice(3, 15);
-        }
-        else {
-          firstListings = sortedListings.slice(0, 3);
+  
+        // Calculate the total price and quantity
+        let totalPrice = 0;
+        let totalQuantity = 0;
+        const maxQuantity = sortedListings[0].itemId === "itm_popberryFruit" ? 3000 : 200;
+        for (let listing of sortedListings) {
+          const quantity = Math.min(listing.quantity, maxQuantity - totalQuantity);
+          totalPrice += listing.price * quantity;
+          totalQuantity += quantity;
+          if (totalQuantity >= maxQuantity) break;
         }
   
         // Calculate the average price
-        const averagePrice = parseFloat((firstListings.reduce((total, listing) => total + listing.price, 0) / firstListings.length).toFixed(2));
+        const averagePrice = parseFloat((totalPrice / totalQuantity).toFixed(2));
   
         // Set the average price in state
         setData((averagePrice * multiplier).toFixed(2));
@@ -152,7 +155,7 @@ export default function Home() {
             price1={dataClay * 36}
             product="Bricks x12"
             sellPrice={dataBrick * 12}
-            energy={30}
+            energy={48}
             calculateTotal={calculateTotal}
             calculateProfit={calculateProfit}
             calculateBtoE={calculateBtoE}
@@ -167,7 +170,7 @@ export default function Home() {
             price2={dataSalt * 4}
             product="Construction Powder x1"
             sellPrice={dataConstructionPowder}
-            energy={6}
+            energy={5}
             calculateTotal={calculateTotal}
             calculateProfit={calculateProfit}
             calculateBtoE={calculateBtoE}
